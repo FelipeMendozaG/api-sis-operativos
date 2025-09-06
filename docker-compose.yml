@@ -9,8 +9,28 @@ services:
     restart: always
     environment:
       - PORT=8080
-      - DB_HOST=db
+      - DB_HOST=35.188.19.96
       - DB_PORT=5432
-      - DB_USER=youruser
-      - DB_PASSWORD=yourpassword
-      - DB_NAME=yourdb
+      - DB_USER=postgres
+      - DB_PASSWORD=Chepita123789@
+      - DB_NAME=bd_sis_operativos
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/certbot/conf:/etc/letsencrypt
+      - ./certbot/certbot/www:/var/www/certbot
+    depends_on:
+      - api
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/certbot/conf:/etc/letsencrypt
+      - ./certbot/certbot/www:/var/www/certbot
