@@ -28,7 +28,8 @@ func main() {
 	//
 	// Configurar CORS
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
-	originsOk := handlers.AllowedOrigins([]string{"*"}) // "*" permite todos los orígenes
+	//originsOk := handlers.AllowedOrigins([]string{"*"}) // "*" permite todos los orígenes
+	originsOk := handlers.AllowedOrigins([]string{"https://dev-sis-operativos.rj.r.appspot.com"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
 
 	log.Println("Servidor corriendo en http://localhost:9000")
