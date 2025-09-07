@@ -3,8 +3,11 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
+
+	gomail "gopkg.in/gomail.v2"
 
 	"github.com/felipemendozag/api-sis-operativos/db"
 	"github.com/felipemendozag/api-sis-operativos/models"
@@ -38,14 +41,14 @@ func CreateAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 	attendance.Date = now
 	// Definir hora de inicio (9:00 AM) y reglas
 	startTime := time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, location)
-	earlyLimit := startTime.Add(-1 * time.Hour) // 8:00 am
+	// earlyLimit := startTime.Add(-1 * time.Hour) // 8:00 am
 	tolerance := startTime.Add(5 * time.Minute) // 9:05 am
 
 	// Reglas de validación
-	if attendanceDate.Before(earlyLimit) {
-		http.Error(w, "No puedes marcar antes de las 8:00 am", http.StatusForbidden)
-		return
-	}
+	// if attendanceDate.Before(earlyLimit) {
+	//	http.Error(w, "No puedes marcar antes de las 8:00 am", http.StatusForbidden)
+	//	return
+	// }
 
 	if attendanceDate.After(tolerance) {
 		attendance.Status = "tardanza"
@@ -59,10 +62,34 @@ func CreateAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sendMailHandler()
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(attendance)
 }
 
 func GetAttendancesHandler(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func sendMailHandler() {
+	m := gomail.NewMessage()
+	m.SetHeader("From", "tucorreo@gmail.com")
+	m.SetHeader("To", "felipe188.mendoza@gmail.com")
+	m.SetHeader("Subject", "USUARIO MARCO ASISTENCIA:")
+	m.SetBody("text/plain", "El usuario ha registrado su asistencia correctamente.")
+
+	d := gomail.NewDialer(
+		"sandbox.smtp.mailtrap.io", // host
+		2525,                       // puerto
+		"ba3c019e93c4be",           // username
+		"59fe8de93b3cce",           // password
+	)
+
+	if err := d.DialAndSend(m); err != nil {
+		log.Printf("Error al enviar correo: %s", err)
+		// http.Error(w, "No se pudo enviar el correo", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("SE ENVIO EL CORREO")
+	//fmt.Fprintln(w, "Correo enviado con éxito!")
 }
