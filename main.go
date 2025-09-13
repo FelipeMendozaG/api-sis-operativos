@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+
 	db.DBConnection()
 	db.DB.AutoMigrate(&models.User{}, &models.Attendance{})
 	router := mux.NewRouter()
@@ -28,10 +29,10 @@ func main() {
 	//
 	// Configurar CORS
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
-	//originsOk := handlers.AllowedOrigins([]string{"*"}) // "*" permite todos los orígenes
-	originsOk := handlers.AllowedOrigins([]string{"https://dev-sis-operativos.rj.r.appspot.com"})
+	originsOk := handlers.AllowedOrigins([]string{"*"}) // "*" permite todos los orígenes
+	//originsOk := handlers.AllowedOrigins([]string{"https://dev-sis-operativos.rj.r.appspot.com"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
 
-	log.Println("Servidor corriendo en http://localhost:9000")
-	log.Fatal(http.ListenAndServe(":9000", handlers.CORS(originsOk, headersOk, methodsOk)(router)))
+	log.Println("Servidor corriendo en http://localhost:9090")
+	log.Fatal(http.ListenAndServe(":9090", handlers.CORS(originsOk, headersOk, methodsOk)(router)))
 }
