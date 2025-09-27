@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -173,17 +174,19 @@ func SendAlert(w http.ResponseWriter, r *http.Request) {
 
 func sendMailHandler() {
 	m := gomail.NewMessage()
-	m.SetHeader("From", "tucorreo@gmail.com")
+	m.SetHeader("From", "no-reply@felipemendozag.com")
 	m.SetHeader("To", "felipe188.mendoza@gmail.com")
 	m.SetHeader("Subject", "USUARIO MARCO ASISTENCIA:")
 	m.SetBody("text/plain", "El usuario ha registrado su asistencia correctamente.")
 
 	d := gomail.NewDialer(
-		"sandbox.smtp.mailtrap.io", // host
-		2525,                       // puerto
-		"ba3c019e93c4be",           // username
-		"59fe8de93b3cce",           // password
+		"mail.felipemendozag.com",
+		25,
+		"",
+		"",
 	)
+
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := d.DialAndSend(m); err != nil {
 		log.Printf("Error al enviar correo: %s", err)
@@ -191,30 +194,29 @@ func sendMailHandler() {
 		return
 	}
 	log.Printf("SE ENVIO EL CORREO")
-	//fmt.Fprintln(w, "Correo enviado con éxito!")
 }
 
 func sendMailAlert(email string, subject string, text string) {
 	m := gomail.NewMessage()
-	m.SetHeader("From", "tucorreo@gmail.com")
+	m.SetHeader("From", "no-reply@felipemendozag.com") // Cambia por tu dominio
 	m.SetHeader("To", email)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", text)
 
 	d := gomail.NewDialer(
-		"sandbox.smtp.mailtrap.io", // host
-		2525,                       // puerto
-		"ba3c019e93c4be",           // username
-		"59fe8de93b3cce",           // password
+		"mail.felipemendozag.com",
+		25,
+		"",
+		"",
 	)
+
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := d.DialAndSend(m); err != nil {
 		log.Printf("Error al enviar correo: %s", err)
-		// http.Error(w, "No se pudo enviar el correo", http.StatusInternalServerError)
 		return
 	}
 	log.Printf("SE ENVIO EL CORREO")
-	//fmt.Fprintln(w, "Correo enviado con éxito!")
 }
 
 func DownloadAttendancesExcelHandler(w http.ResponseWriter, r *http.Request) {
